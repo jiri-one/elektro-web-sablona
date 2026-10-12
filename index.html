@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Název firmy s.r.o. – elektroinstalace, rozvaděče, chytrá domácnost</title>
+<meta name="description" content="Elektroinstalace pro byty, domy i průmysl. Zapojení rozvaděčů, měření a regulace, oživení technologií a chytrá domácnost se zabezpečením.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root {
+	--ink: #1d1d1b;
+	--muted: #5a6273;
+	--paper: #fff;
+	--soft: #f3f5f9;
+	--line: #e2e6ee;
+	--night: #0b1430;
+	--soil: #0d1428;
+	--volt: #ffd23f;
+	--wrap: 1120px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+	margin: 0;
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+	color: var(--ink);
+	background: var(--paper);
+	line-height: 1.55;
+}
+a { color: inherit; }
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
+
+/* hlavička: logo + název jako text */
+.top { border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 12px; }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.brand svg { width: 48px; height: 48px; flex: none; }
+.brand .name { display: flex; flex-direction: column; line-height: 1.1; }
+.brand b { font-size: 1.05rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
+.brand small { font-size: .78rem; letter-spacing: .12em; color: var(--muted); }
+.top nav { display: flex; gap: 22px; font-weight: 600; }
+.top nav a { text-decoration: none; padding: 4px 0; border-bottom: 3px solid transparent; }
+.top nav a:hover, .top nav a:focus-visible { border-bottom-color: var(--volt); }
+
+/* úvod s animací */
+.hero { background: var(--night); color: #eef2fa; }
+.hero-text { padding-top: 48px; padding-bottom: 8px; }
+.hero h1 { font-size: clamp(1.9rem, 4.6vw, 3.2rem); line-height: 1.12; margin: 0 0 14px; max-width: 18ch; }
+.hero p { margin: 0; max-width: 60ch; color: #c5cee0; font-size: 1.08rem; }
+.cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px !important; }
+.btn { display: inline-block; padding: 11px 20px; border-radius: 6px; font-weight: 700; text-decoration: none; background: var(--volt); color: var(--ink); }
+.btn.ghost { background: transparent; color: #eef2fa; box-shadow: inset 0 0 0 2px #46587f; }
+.btn:hover, .btn:focus-visible { filter: brightness(1.08); }
+.scene { margin: 0; }
+.scene .view { overflow: hidden; }
+.scene svg { display: block; width: 100%; height: auto; max-width: 1280px; margin: 0 auto; }
+.scene figcaption { background: var(--soil); }
+.scene figcaption .wrap { display: flex; align-items: flex-start; gap: 18px; padding-top: 4px; padding-bottom: 26px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; flex: 1; counter-reset: krok; }
+.steps li { font-size: .86rem; color: #dfe6f3; counter-increment: krok; }
+.steps .lbl::before { content: counter(krok) " · "; color: var(--volt); font-weight: 700; }
+.steps .bar { display: block; height: 3px; margin-bottom: 7px; background: var(--volt); transform-origin: left; border-radius: 2px; box-shadow: 0 0 0 1px #24324f; }
+.replay { flex: none; font: inherit; font-size: .86rem; color: #dfe6f3; background: none; border: 1px solid #46587f; border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+.replay:hover, .replay:focus-visible { border-color: var(--volt); color: #fff; }
+/* na mobilu je scéna větší a kamera jede za proudem: od trafa k domu */
+@media (max-width: 700px) {
+	.scene svg { width: 190%; max-width: none; transform: translateX(-34.4%); }
+}
+@media (max-width: 760px) {
+	.steps { grid-template-columns: repeat(3, 1fr); }
+	.scene figcaption .wrap { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) { .replay { display: none; } }
+
+/* scéna */
+#scene .st { fill: #cfd8e8; }
+#scene .room { fill: #17223f; }
+#scene .out { fill: none; stroke: #cfd8e8; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+#scene .furn { fill: #22305a; stroke: #6f83a8; stroke-width: 2; stroke-linejoin: round; }
+#scene .dev { fill: #2b3b5f; stroke: #cfd8e8; stroke-width: 2; stroke-linejoin: round; }
+#scene .pane { fill: #0d1838; stroke: #8fa0c2; stroke-width: 2.5; }
+#scene .wire, #scene .live, #scene .halo, #scene .flow { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#scene .wire { stroke: #ffd23f; stroke-width: 3; }
+#scene.js .wire { stroke: #3b4d74; }
+#scene .wire.cable { stroke-width: 4.5; }
+#scene .wire.hv, #scene .live.hv { stroke-width: 2; }
+#scene .halo.hv { stroke-width: 7; }
+#scene .live { stroke: #ffd23f; stroke-width: 3; }
+#scene .live.cable { stroke-width: 4.5; }
+#scene .halo { stroke: #ffd23f; stroke-width: 11; opacity: .16; }
+#scene .flow { stroke: #fff7d6; stroke-width: 1.8; stroke-dasharray: 4 16; opacity: .85; }
+#scene .lit { fill: #ffe7a6; }
+#scene .cone { fill: url(#cone); }
+#scene .pool { fill: url(#pool); }
+#scene text { font-family: inherit; }
+#scene .blind { transform-box: fill-box; transform-origin: 50% 0; }
+#scene .fan { opacity: 0; }
+#scene #cam { transform-box: view-box; transform-origin: 1072px 250px; }
+#scene .arc { transform-box: view-box; transform-origin: 830px 458px; fill: none; stroke: #5ad1ff; stroke-width: 2.5; stroke-linecap: round; }
+#scene .t-old { opacity: 0; }
+#scene #lamp-f, #scene #pool-f { opacity: .18; }
+@media (max-width: 560px) { #scene .stars-sky circle { r: 2.2px; } }
+
+/* obsah */
+section.block { padding: 64px 0; }
+section.block.alt { background: var(--soft); }
+h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); margin: 0 0 8px; }
+h2::after { content: ""; display: block; width: 56px; height: 4px; background: var(--volt); margin-top: 10px; border-radius: 2px; }
+.lead { color: var(--muted); max-width: 62ch; margin: 0 0 28px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+.card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.card p { margin: 0; color: var(--muted); font-size: .95rem; }
+.contact { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 28px 80px; }
+.reach { display: grid; justify-items: start; gap: 14px; }
+.reach a { font-size: 1.6rem; font-weight: 700; text-decoration: none; border-bottom: 3px solid var(--volt); }
+.contact dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; font-size: .92rem; }
+.contact dt { color: var(--muted); }
+.contact dd { margin: 0; }
+footer { border-top: 1px solid var(--line); padding: 22px 0 34px; color: var(--muted); font-size: .85rem; }
+</style>
+</head>
+<body>
+
+<header class="top">
+	<div class="wrap">
+		<a class="brand" href="#">
+			<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21.5" fill="none" stroke="currentColor" stroke-width="3"/><path fill="currentColor" d="M28 9 15 27h8l-3 13 13-19h-8z"/></svg>
+			<span class="name"><b>Název firmy</b><small>s.r.o.</small></span>
+		</a>
+		<nav aria-label="Hlavní">
+			<a href="#sluzby">Služby</a>
+			<a href="#kontakt">Kontakt</a>
+		</nav>
+	</div>
+</header>
+
+<main>
+<section class="hero">
+	<div class="wrap hero-text">
+		<h1>Od rozvaděče po chytrou domácnost</h1>
+		<p>Elektroinstalace pro byty, domy i průmysl. Zapojení rozvaděčů, měření a regulace, oživení technologií a chytrá domácnost se zabezpečením.</p>
+		<p class="cta"><a class="btn" href="#kontakt">Poptat práci</a> <a class="btn ghost" href="tel:+420123456789">Zavolat 123 456 789</a></p>
+	</div>
+
+	<figure class="scene">
+<div class="view">
+<svg id="scene" viewBox="0 0 1280 620" role="img" aria-labelledby="scene-title scene-desc">
+<title id="scene-title">Cesta elektřiny do chytré domácnosti</title>
+<desc id="scene-desc">Elektřina vede z trafostanice podzemním kabelem do přípojky s elektroměrem, odtud do domovního rozvaděče a z něj do světel, chytré domácnosti a zabezpečení.</desc>
+<defs>
+	<linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="500">
+		<stop offset="0" stop-color="#0b1430"/>
+		<stop offset="1" stop-color="#1c2c52"/>
+	</linearGradient>
+	<linearGradient id="cone" x1="0" y1="0" x2="0" y2="1">
+		<stop offset="0" stop-color="#ffdc8f" stop-opacity=".5"/>
+		<stop offset="1" stop-color="#ffdc8f" stop-opacity="0"/>
+	</linearGradient>
+	<radialGradient id="pool">
+		<stop offset="0" stop-color="#ffcf7a" stop-opacity=".42"/>
+		<stop offset="1" stop-color="#ffcf7a" stop-opacity="0"/>
+	</radialGradient>
+	<radialGradient id="glow">
+		<stop offset="0" stop-color="#ffe9a8" stop-opacity=".95"/>
+		<stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/>
+	</radialGradient>
+	<radialGradient id="hum">
+		<stop offset="0" stop-color="#ffd23f" stop-opacity=".55"/>
+		<stop offset="1" stop-color="#ffd23f" stop-opacity="0"/>
+	</radialGradient>
+	<linearGradient id="camcone" gradientUnits="userSpaceOnUse" x1="1080" y1="256" x2="1200" y2="490">
+		<stop offset="0" stop-color="#9fe3ff" stop-opacity=".38"/>
+		<stop offset="1" stop-color="#9fe3ff" stop-opacity="0"/>
+	</linearGradient>
+	<radialGradient id="pir">
+		<stop offset="0" stop-color="#ff6b6b" stop-opacity=".5"/>
+		<stop offset="1" stop-color="#ff6b6b" stop-opacity="0"/>
+	</radialGradient>
+	<g id="ins">
+		<rect x="-2.5" y="-15" width="5" height="15" rx="1.5"/>
+		<ellipse cy="-4" rx="7" ry="2.5"/>
+		<ellipse cy="-10" rx="6" ry="2.2"/>
+	</g>
+	<path id="star" d="M0-5 1.5-1.5 5-1.2 2.3 1.1 3.1 4.7 0 2.8-3.1 4.7-2.3 1.1-5-1.2-1.5-1.5Z"/>
+	<clipPath id="clip-a"><rect x="482" y="364" width="162" height="136"/></clipPath>
+	<clipPath id="clip-b"><rect x="650" y="364" width="204" height="136"/></clipPath>
+	<clipPath id="clip-c"><rect x="860" y="364" width="188" height="136"/></clipPath>
+	<clipPath id="clip-d"><rect x="482" y="232" width="162" height="120"/></clipPath>
+	<clipPath id="clip-e"><rect x="650" y="232" width="204" height="120"/></clipPath>
+	<clipPath id="clip-f"><rect x="860" y="232" width="188" height="120"/></clipPath>
+</defs>
+
+<!-- obloha -->
+<rect width="1280" height="500" fill="url(#sky)"/>
+<g class="stars-sky" fill="#fff">
+	<circle cx="38" cy="30" r="1.4"/><circle cx="178" cy="26" r="1.2"/><circle cx="236" cy="132" r="1.3"/>
+	<circle cx="410" cy="36" r="1.5"/><circle cx="462" cy="122" r="1.1"/><circle cx="520" cy="58" r="1.4"/>
+	<circle cx="604" cy="24" r="1.2"/><circle cx="640" cy="118" r="1.3"/><circle cx="700" cy="52" r="1.5"/>
+	<circle cx="846" cy="34" r="1.3"/><circle cx="904" cy="98" r="1.2"/><circle cx="968" cy="48" r="1.5"/>
+	<circle cx="1022" cy="130" r="1.1"/><circle cx="1084" cy="34" r="1.4"/><circle cx="1136" cy="104" r="1.2"/>
+	<circle cx="1196" cy="56" r="1.5"/><circle cx="1252" cy="128" r="1.3"/><circle cx="1240" cy="22" r="1.1"/>
+	<circle cx="560" cy="168" r="1.1"/><circle cx="398" cy="196" r="1.2"/><circle cx="1180" cy="188" r="1.2"/>
+	<circle cx="300" cy="150" r="1.3"/><circle cx="1110" cy="162" r="1.1"/><circle cx="770" cy="20" r="1.2"/>
+</g>
+<g>
+	<circle cx="330" cy="78" r="22" fill="#f4f1e4"/>
+	<circle cx="342" cy="70" r="20" fill="url(#sky)"/>
+</g>
+
+<!-- vedení VN a trafostanice -->
+<path class="wire hv" data-w="hv3" data-flow d="M-20 18Q80 76 138 110"/>
+<path class="wire hv" data-w="hv2" data-flow d="M-20 50Q50 92 100 110"/>
+<path class="wire hv" data-w="hv1" data-flow d="M-20 82Q22 114 62 110"/>
+<ellipse id="tr-hum" cx="100" cy="246" rx="78" ry="70" fill="url(#hum)" opacity=".3"/>
+<polygon class="dev" points="94,500 106,500 103,118 97,118"/>
+<path d="M56 126H144" stroke="#cfd8e8" stroke-width="6" stroke-linecap="round"/>
+<g fill="#cfd8e8">
+	<use href="#ins" x="62" y="125"/><use href="#ins" x="100" y="125"/><use href="#ins" x="138" y="125"/>
+</g>
+<path class="wire" data-w="j1" d="M62 110Q66 150 80 194"/>
+<path class="wire" data-w="j2" d="M100 110V194"/>
+<path class="wire" data-w="j3" d="M138 110Q134 150 120 194"/>
+<g fill="#cfd8e8">
+	<use href="#ins" transform="translate(80 204) scale(.7)"/>
+	<use href="#ins" transform="translate(100 204) scale(.7)"/>
+	<use href="#ins" transform="translate(120 204) scale(.7)"/>
+</g>
+<rect class="dev" x="58" y="214" width="12" height="58" rx="3"/>
+<rect class="dev" x="130" y="214" width="12" height="58" rx="3"/>
+<path d="M60 226h8M60 238h8M60 250h8M60 262h8M132 226h8M132 238h8M132 250h8M132 262h8" stroke="#8fa0c2" stroke-width="2"/>
+<rect class="dev" x="70" y="204" width="60" height="78" rx="6"/>
+<path d="M100 224 88 246H112Z" fill="#ffd23f"/>
+<path d="M101 229 96 238H101L98 244 105 235H100Z" fill="#0b1430"/>
+<path d="M60 286H140" stroke="#cfd8e8" stroke-width="5" stroke-linecap="round"/>
+
+<!-- zem -->
+<rect y="500" width="1280" height="120" fill="#0d1428"/>
+<path d="M0 500H1280" stroke="#3a4d77" stroke-width="3"/>
+<g fill="#1f3a34" stroke="#4d7a68" stroke-width="2">
+	<circle cx="420" cy="486" r="14"/><circle cx="440" cy="480" r="18"/><circle cx="458" cy="490" r="10"/>
+</g>
+
+<!-- kabel z trafa do přípojky -->
+<path class="wire cable" data-w="lv" data-flow d="M112 286V548Q112 562 126 562H336Q350 562 350 548V502"/>
+
+<!-- přípojkový pilíř s elektroměrem -->
+<rect x="316" y="392" width="78" height="10" rx="3" fill="#cfd8e8"/>
+<rect class="dev" x="322" y="400" width="66" height="100"/>
+<rect x="332" y="410" width="46" height="30" rx="2" fill="none" stroke="#8fa0c2" stroke-width="2"/>
+<path d="M356 415 349 427H355L351 436 362 422H356L360 415Z" fill="#ffd23f"/>
+<rect x="332" y="448" width="46" height="42" rx="2" fill="none" stroke="#8fa0c2" stroke-width="2"/>
+<rect x="339" y="455" width="32" height="15" rx="2" fill="#0b1430" stroke="#8fa0c2" stroke-width="1.5"/>
+<text id="meter" x="355" y="466.5" text-anchor="middle" font-size="10" font-family="monospace" fill="#7cf0a8">0427</text>
+<circle id="meter-led" cx="371" cy="480" r="2.6" fill="#ff5a5f"/>
+
+<!-- dům: místnosti -->
+<polygon points="476,226 765,100 1054,226" fill="#16213b"/>
+<rect class="room" x="482" y="364" width="162" height="136"/>
+<rect class="room" x="650" y="364" width="204" height="136"/>
+<rect class="room" x="860" y="364" width="188" height="136"/>
+<rect class="room" x="482" y="232" width="162" height="120"/>
+<rect class="room" x="650" y="232" width="204" height="120"/>
+<rect class="room" x="860" y="232" width="188" height="120"/>
+
+<!-- dům: konstrukce v řezu -->
+<path d="M446 232 765 92 1084 232" fill="none" stroke="#cfd8e8" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<rect class="st" x="470" y="220" width="590" height="12"/>
+<rect class="st" x="470" y="352" width="590" height="12"/>
+<rect class="st" x="462" y="500" width="606" height="16"/>
+<rect class="st" x="470" y="220" width="12" height="280"/>
+<rect class="st" x="1048" y="220" width="12" height="280"/>
+<rect class="st" x="644" y="232" width="6" height="120"/>
+<rect class="st" x="854" y="232" width="6" height="120"/>
+<rect class="st" x="644" y="364" width="6" height="136"/>
+<rect class="st" x="854" y="364" width="6" height="136"/>
+<circle class="pane" cx="765" cy="168" r="13"/>
+<path d="M765 155V181M752 168H778" stroke="#8fa0c2" stroke-width="2"/>
+
+<!-- okna -->
+<rect class="pane" x="680" y="380" width="96" height="46" rx="2"/>
+<path d="M728 380V426" stroke="#8fa0c2" stroke-width="2"/>
+<rect class="pane" x="980" y="378" width="52" height="40" rx="2"/>
+<rect class="pane" x="716" y="252" width="84" height="52" rx="2"/>
+<path d="M758 252V304" stroke="#8fa0c2" stroke-width="2"/>
+<rect class="pane" x="900" y="254" width="60" height="44" rx="2"/>
+<g fill="#fff" opacity=".7">
+	<circle cx="700" cy="392" r="1"/><circle cx="752" cy="404" r="1.1"/><circle cx="1012" cy="390" r="1"/>
+	<circle cx="736" cy="266" r="1.1"/><circle cx="782" cy="284" r="1"/><circle cx="920" cy="268" r="1"/>
+</g>
+
+<!-- světlo v místnostech (dopadající) -->
+<g clip-path="url(#clip-a)"><ellipse class="pool lamp" data-wire="l1" data-at="563 358" cx="563" cy="368" rx="130" ry="150"/></g>
+<g clip-path="url(#clip-b)">
+	<ellipse class="pool lamp" data-wire="l1" data-at="705 358" cx="705" cy="368" rx="120" ry="150"/>
+	<ellipse class="pool lamp" data-wire="l1" data-at="790 358" cx="790" cy="368" rx="120" ry="150"/>
+</g>
+<g clip-path="url(#clip-c)">
+	<ellipse class="pool lamp" data-wire="l1s" data-at="916 410" cx="922" cy="420" rx="90" ry="60"/>
+	<ellipse class="pool lamp" data-wire="l1" data-at="1000 358" cx="1000" cy="404" rx="110" ry="110"/>
+</g>
+<g clip-path="url(#clip-d)"><ellipse class="pool lamp" data-wire="l2" data-at="563 226" cx="563" cy="236" rx="120" ry="140"/></g>
+<g clip-path="url(#clip-e)">
+	<ellipse class="pool lamp" id="pool-e" data-wire="l2" data-at="752 226" cx="752" cy="236" rx="130" ry="140"/>
+	<ellipse class="pool lamp" data-wire="l2" data-at="752 226" cx="838" cy="322" rx="50" ry="40"/>
+</g>
+<g clip-path="url(#clip-f)"><ellipse class="pool lamp" id="pool-f" data-wire="l2" data-at="954 226" cx="954" cy="236" rx="120" ry="140"/></g>
+
+<!-- rozvody v domě -->
+<path class="wire cable" data-w="feed" data-flow d="M366 502V566Q366 580 380 580H491Q505 580 505 566V476"/>
+<path class="wire" data-w="l1" d="M512 392V358H1000"/>
+<path class="wire" data-w="l1s" d="M916 358V410"/>
+<path class="wire" data-w="l2" d="M500 392V226H954"/>
+<path class="wire" data-w="s1" d="M546 476V490H1036"/>
+<path class="wire cable" data-w="o1" data-flow d="M534 476V600H1240V504"/>
+<path class="wire cable" data-w="o1a" d="M1110 600V504"/>
+<path class="wire cable" data-w="o1b" d="M1175 600V504"/>
+
+<!-- přízemí: chodba s rozvaděčem a klávesnicí ústředny -->
+<rect class="dev" x="494" y="392" width="60" height="84" rx="4"/>
+<rect x="502" y="399" width="44" height="14" rx="2" fill="#1d2a4a" stroke="#8fa0c2" stroke-width="1.5"/>
+<g id="main-switch" style="transform-box: view-box; transform-origin: 524px 406px">
+	<rect x="520" y="400" width="8" height="10" rx="2" fill="#ff5a5f"/>
+</g>
+<g fill="#1d2a4a" stroke="#8fa0c2" stroke-width="1.5">
+	<rect x="501" y="420" width="10" height="20" rx="1.5"/><rect x="513" y="420" width="10" height="20" rx="1.5"/>
+	<rect x="525" y="420" width="10" height="20" rx="1.5"/><rect x="537" y="420" width="10" height="20" rx="1.5"/>
+	<rect x="501" y="446" width="10" height="20" rx="1.5"/><rect x="513" y="446" width="10" height="20" rx="1.5"/>
+	<rect x="525" y="446" width="10" height="20" rx="1.5"/><rect x="537" y="446" width="10" height="20" rx="1.5"/>
+</g>
+<g fill="#e3e9f3">
+	<rect class="brk" x="503.5" y="423" width="5" height="6" rx="1"/><rect class="brk" x="515.5" y="423" width="5" height="6" rx="1"/>
+	<rect class="brk" x="527.5" y="423" width="5" height="6" rx="1"/><rect class="brk" x="539.5" y="423" width="5" height="6" rx="1"/>
+	<rect class="brk" x="503.5" y="449" width="5" height="6" rx="1"/><rect class="brk" x="515.5" y="449" width="5" height="6" rx="1"/>
+	<rect class="brk" x="527.5" y="449" width="5" height="6" rx="1"/><rect class="brk" x="539.5" y="449" width="5" height="6" rx="1"/>
+</g>
+<circle id="sb-led" cx="547" cy="470" r="2.6" fill="#6be585"/>
+<rect class="dev" x="598" y="404" width="30" height="34" rx="4"/>
+<rect x="602" y="408" width="22" height="11" rx="1.5" fill="#0b1430"/>
+<path id="kp-lock" d="M609 418V415.5Q609 412.5 613 412.5T617 415.5V418M607.5 418H618.5V422H607.5Z" fill="none" stroke="#ff8a8a" stroke-width="1.4" transform="translate(0 -3)"/>
+<g fill="#8fa0c2"><circle cx="606" cy="425" r="1.6"/><circle cx="613" cy="425" r="1.6"/><circle cx="620" cy="425" r="1.6"/><circle cx="606" cy="431" r="1.6"/><circle cx="613" cy="431" r="1.6"/></g>
+<circle id="kp-led" cx="620.5" cy="431" r="2.2" fill="#ff5a5f"/>
+<rect class="dev" x="630" y="368" width="10" height="7" rx="2"/>
+<circle class="pir-led" cx="635" cy="372" r="1.6" fill="#ff5a5f"/>
+<path class="fan" d="M635 375 560 500H644V375Z" fill="url(#pir)"/>
+
+<!-- přízemí: obývák -->
+<rect class="furn" x="680" y="434" width="112" height="26" rx="8"/>
+<rect class="furn" x="676" y="456" width="120" height="24" rx="6"/>
+<rect class="furn" x="666" y="446" width="16" height="36" rx="6"/>
+<rect class="furn" x="790" y="446" width="16" height="36" rx="6"/>
+<path d="M684 482V492M788 482V492" stroke="#6f83a8" stroke-width="3" stroke-linecap="round"/>
+<rect class="furn" x="812" y="470" width="36" height="30" rx="2"/>
+<rect class="dev" x="818" y="458" width="24" height="12" rx="4"/>
+<circle id="hub-led" cx="830" cy="464" r="2.2" fill="#5ad1ff"/>
+<path class="arc" d="M822 450A11 11 0 0 1 838 450"/>
+<path class="arc" d="M816 444A19 19 0 0 1 844 444"/>
+<path class="arc" d="M810 438A27 27 0 0 1 850 438"/>
+<rect x="812" y="394" width="34" height="28" rx="6" fill="#0b1430" stroke="#cfd8e8" stroke-width="2" id="thermo"/>
+<text class="t-old" x="829" y="413" text-anchor="middle" font-size="12" font-weight="700" fill="#cfd8e8">19°</text>
+<text class="t-new" x="829" y="413" text-anchor="middle" font-size="12" font-weight="700" fill="#ffb86b">21°</text>
+
+<!-- přízemí: kuchyně -->
+<rect class="furn" x="872" y="380" width="100" height="30" rx="2"/>
+<path d="M922 380V410" stroke="#6f83a8" stroke-width="2"/>
+<rect class="furn" x="872" y="452" width="164" height="48" rx="2"/>
+<path d="M913 456V496M954 456V496M995 456V496" stroke="#6f83a8" stroke-width="2"/>
+<rect x="868" y="446" width="172" height="8" rx="2" fill="#8fa0c2"/>
+<path d="M1000 364V392" stroke="#8fa0c2" stroke-width="2"/>
+<path class="furn" d="M988 404 992 392H1008L1012 404Z"/>
+
+<!-- patro: pracovna -->
+<rect x="520" y="316" width="104" height="6" rx="2" fill="#8fa0c2"/>
+<path d="M526 322V352M618 322V352" stroke="#8fa0c2" stroke-width="3" stroke-linecap="round"/>
+<rect class="dev" x="548" y="284" width="46" height="30" rx="3"/>
+<path d="M571 314V316" stroke="#cfd8e8" stroke-width="3"/>
+<g class="lamp" data-wire="l2" data-at="563 226">
+	<rect x="551" y="287" width="40" height="24" rx="2" fill="#5ad1ff" opacity=".28"/>
+	<path d="M556 293H576M556 299H584M556 305H570" stroke="#9fe3ff" stroke-width="2" stroke-linecap="round"/>
+</g>
+
+<!-- patro: ložnice s žaluzií -->
+<g class="blind" id="blind-e">
+	<rect x="716" y="254" width="84" height="50" fill="#2a395c"/>
+	<path d="M716 260H800M716 266H800M716 272H800M716 278H800M716 284H800M716 290H800M716 296H800" stroke="#4a5d86" stroke-width="1.5"/>
+</g>
+<rect x="712" y="246" width="92" height="8" rx="2" fill="#8fa0c2"/>
+<rect class="furn" x="670" y="306" width="10" height="46" rx="3"/>
+<rect class="furn" x="680" y="326" width="140" height="16" rx="4"/>
+<path class="furn" d="M720 326Q760 316 816 322V334H720Z"/>
+<ellipse class="furn" cx="699" cy="321" rx="15" ry="6"/>
+<rect class="furn" x="816" y="318" width="8" height="34" rx="3"/>
+<rect class="furn" x="828" y="332" width="20" height="20" rx="2"/>
+<path class="furn" d="M832 330 834 318H842L844 330Z"/>
+<path class="lamp lit" data-wire="l2" data-at="752 226" d="M832 330 834 318H842L844 330Z"/>
+<rect class="dev" x="840" y="236" width="10" height="7" rx="2"/>
+<circle class="pir-led" cx="845" cy="240" r="1.6" fill="#ff5a5f"/>
+<path class="fan" d="M845 243 700 352H854V243Z" fill="url(#pir)"/>
+
+<!-- patro: dětský pokoj s nočním světlem -->
+<g class="blind" id="blind-f">
+	<rect x="900" y="256" width="60" height="42" fill="#2a395c"/>
+	<path d="M900 262H960M900 268H960M900 274H960M900 280H960M900 286H960M900 292H960" stroke="#4a5d86" stroke-width="1.5"/>
+</g>
+<rect x="896" y="248" width="68" height="8" rx="2" fill="#8fa0c2"/>
+<rect class="furn" x="1036" y="312" width="8" height="40" rx="3"/>
+<rect class="furn" x="950" y="330" width="86" height="14" rx="4"/>
+<ellipse class="furn" cx="1020" cy="325" rx="12" ry="5"/>
+<path d="M872 330H922" stroke="#8fa0c2" stroke-width="4" stroke-linecap="round"/>
+<path class="dev" d="M888 330A8 8 0 0 1 904 330Z"/>
+<g id="night-stars" fill="#ffe7a6">
+	<use href="#star" x="980" y="262"/><use href="#star" x="1012" y="248" transform="rotate(12 1012 248)"/>
+	<use href="#star" x="1026" y="284"/><use href="#star" x="958" y="306" transform="rotate(-10 958 306)"/>
+	<use href="#star" x="882" y="272"/><use href="#star" x="992" y="296"/>
+</g>
+
+<!-- svítidla (kryt + kužel světla) -->
+<g class="fix">
+	<rect x="554" y="364" width="18" height="5" rx="2" fill="#8fa0c2"/>
+	<rect x="696" y="364" width="18" height="5" rx="2" fill="#8fa0c2"/>
+	<rect x="781" y="364" width="18" height="5" rx="2" fill="#8fa0c2"/>
+	<rect x="554" y="232" width="18" height="5" rx="2" fill="#8fa0c2"/>
+	<rect x="743" y="232" width="18" height="5" rx="2" fill="#8fa0c2"/>
+	<rect x="945" y="232" width="18" height="5" rx="2" fill="#8fa0c2"/>
+	<path d="M876 413H968" stroke="#8fa0c2" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g class="lamp" data-wire="l1" data-at="563 358"><rect class="lit" x="554" y="364" width="18" height="5" rx="2"/><path class="cone" d="M555 369H571L606 500H520Z"/></g>
+<g class="lamp" data-wire="l1" data-at="705 358"><rect class="lit" x="696" y="364" width="18" height="5" rx="2"/><path class="cone" d="M697 369H713L748 500H662Z"/></g>
+<g class="lamp" data-wire="l1" data-at="790 358"><rect class="lit" x="781" y="364" width="18" height="5" rx="2"/><path class="cone" d="M782 369H798L833 500H747Z"/></g>
+<g class="lamp" data-wire="l1s" data-at="916 410"><path d="M876 413H968" stroke="#ffe7a6" stroke-width="3" stroke-linecap="round"/><path class="cone" d="M876 414H968L976 446H868Z"/></g>
+<g class="lamp" data-wire="l1" data-at="1000 358"><path class="lit" d="M990 404 993 395H1007L1010 404Z"/><path class="cone" d="M990 405H1010L1036 446H964Z"/></g>
+<g class="lamp" data-wire="l2" data-at="563 226"><rect class="lit" x="554" y="232" width="18" height="5" rx="2"/><path class="cone" d="M555 237H571L602 352H524Z"/></g>
+<g class="lamp" id="lamp-e" data-wire="l2" data-at="752 226"><rect class="lit" x="743" y="232" width="18" height="5" rx="2"/><path class="cone" d="M744 237H760L791 352H713Z"/></g>
+<g class="lamp" id="lamp-f" data-wire="l2" data-at="954 226"><rect class="lit" x="945" y="232" width="18" height="5" rx="2"/><path class="cone" d="M946 237H962L993 352H915Z"/></g>
+<path id="night-dome" d="M890 330A6 6 0 0 1 902 330Z" class="lit"/>
+
+<!-- venku: siréna, kamera, zahradní světla -->
+<rect class="dev" x="446" y="262" width="18" height="26" rx="4"/>
+<circle id="siren-led" cx="455" cy="272" r="3.2" fill="#5aa9ff"/>
+<path d="M1060 250H1070" stroke="#cfd8e8" stroke-width="3" stroke-linecap="round"/>
+<g id="cam">
+	<path id="cam-cone" d="M1086 258 1132 500H1272V456Z" fill="url(#camcone)"/>
+	<g transform="rotate(28 1072 250)">
+		<rect class="dev" x="1068" y="244" width="24" height="12" rx="4"/>
+		<circle cx="1092" cy="250" r="3" fill="#9fe3ff"/>
+	</g>
+</g>
+<g>
+	<rect class="dev" x="1105" y="472" width="10" height="28"/><rect x="1102" y="464" width="16" height="9" rx="2" fill="#8fa0c2"/>
+	<rect class="dev" x="1170" y="472" width="10" height="28"/><rect x="1167" y="464" width="16" height="9" rx="2" fill="#8fa0c2"/>
+	<rect class="dev" x="1235" y="472" width="10" height="28"/><rect x="1232" y="464" width="16" height="9" rx="2" fill="#8fa0c2"/>
+</g>
+<g class="lamp" data-wire="o1a" data-at="1110 504"><ellipse cx="1110" cy="498" rx="34" ry="9" fill="url(#glow)" opacity=".6"/><rect class="lit" x="1102" y="464" width="16" height="9" rx="2"/></g>
+<g class="lamp" data-wire="o1b" data-at="1175 504"><ellipse cx="1175" cy="498" rx="34" ry="9" fill="url(#glow)" opacity=".6"/><rect class="lit" x="1167" y="464" width="16" height="9" rx="2"/></g>
+<g class="lamp" data-wire="o1" data-at="1240 504"><ellipse cx="1240" cy="498" rx="34" ry="9" fill="url(#glow)" opacity=".6"/><rect class="lit" x="1232" y="464" width="16" height="9" rx="2"/></g>
+</svg>
+</div>
+		<figcaption>
+			<div class="wrap">
+				<ol class="steps">
+					<li><span class="bar"></span><span class="lbl">Trafostanice</span></li>
+					<li><span class="bar"></span><span class="lbl">Přípojka a elektroměr</span></li>
+					<li><span class="bar"></span><span class="lbl">Rozvaděč</span></li>
+					<li><span class="bar"></span><span class="lbl">Osvětlení</span></li>
+					<li><span class="bar"></span><span class="lbl">Chytrá domácnost</span></li>
+					<li><span class="bar"></span><span class="lbl">Zabezpečení</span></li>
+				</ol>
+				<button class="replay" type="button">Přehrát znovu</button>
+			</div>
+		</figcaption>
+	</figure>
+</section>
+
+<section class="block" id="sluzby">
+	<div class="wrap">
+		<h2>Služby</h2>
+		<p class="lead">Od jedné zásuvky po kompletní elektroinstalaci průmyslové stavby.</p>
+		<div class="cards">
+			<article class="card"><h3>Elektroinstalace domů a bytů</h3><p>Nové rozvody i rekonstrukce: zásuvky, osvětlení, výměna starého rozvaděče. Na konci předávám dokumentaci.</p></article>
+			<article class="card"><h3>Chytrá domácnost a zabezpečení</h3><p>Světla, žaluzie a topení z mobilu nebo automaticky. Zabezpečovací systém, čidla a kamery v jednom.</p></article>
+			<article class="card"><h3>Rozvaděče</h3><p>Drátování a zapojení rozvaděčů na zakázku, od bytových po průmyslové.</p></article>
+			<article class="card"><h3>Měření a regulace</h3><p>Zapojení čidel, regulátorů a řídicích systémů pro vytápění, vzduchotechniku a technologie.</p></article>
+			<article class="card"><h3>Oživení a uvedení do provozu</h3><p>Najetí a oživení elektro částí staveb a technologií, funkční zkoušky a doladění.</p></article>
+			<article class="card"><h3>Průmyslové stavby</h3><p>Kompletní stavební elektroinstalace v průmyslových objektech, od kabelových tras po zapojení technologií.</p></article>
+			<article class="card"><h3>Servis a opravy</h3><p>Hledání a odstranění poruch, údržba a úpravy stávajících instalací.</p></article>
+		</div>
+	</div>
+</section>
+
+<section class="block alt" id="kontakt">
+	<div class="wrap">
+		<h2>Kontakt</h2>
+		<p class="lead">Zavolejte, nebo napište, co potřebujete. Ozvu se co nejdřív.</p>
+		<div class="contact">
+			<div class="reach">
+				<a href="tel:+420123456789">+420 123 456 789</a>
+				<a href="mailto:info@example.com">info@example.com</a>
+			</div>
+			<dl>
+				<dt>Firma</dt><dd>Název firmy s.r.o.</dd>
+				<dt>Sídlo</dt><dd>Ulice 123<br>100 00 Praha</dd>
+				<dt>IČO</dt><dd>12345678</dd>
+			</dl>
+		</div>
+	</div>
+</section>
+</main>
+
+<footer>
+	<div class="wrap">
+		Název firmy s.r.o., Ulice 123, 100 00 Praha, IČO 12345678.
+		Zapsaná v obchodním rejstříku vedeném Městským soudem v Praze, oddíl C, vložka 000000.
+	</div>
+</footer>
+
+<script>
+(() => {
+	const svg = document.getElementById('scene');
+	const fig = svg.closest('figure');
+	const steps = [...fig.querySelectorAll('.steps li')];
+	const replay = fig.querySelector('.replay');
+	if (matchMedia('(prefers-reduced-motion: reduce)').matches || !svg.animate) return;
+
+	const NS = 'http://www.w3.org/2000/svg';
+	const $ = s => svg.querySelector(s);
+	const $$ = s => [...svg.querySelectorAll(s)];
+	const wires = {};
+	const narrow = matchMedia('(max-width: 700px)');
+	let anims = [];
+	let pan = null;
+
+	// Each wire gets a glow, a yellow line that fills in, and optionally running dashes.
+	svg.classList.add('js');
+	for (const base of $$('.wire')) {
+		const id = base.dataset.w;
+		const extra = ['cable', 'hv'].filter(c => base.classList.contains(c)).map(c => ' ' + c).join('');
+		const make = cls => {
+			const p = document.createElementNS(NS, 'path');
+			p.setAttribute('d', base.getAttribute('d'));
+			p.setAttribute('class', cls);
+			base.after(p);
+			return p;
+		};
+		const flow = 'flow' in base.dataset ? make('flow') : null;
+		const live = make('live' + extra);
+		const halo = make('halo' + extra);
+		wires[id] = { base, live, halo, flow, len: base.getTotalLength() };
+	}
+
+	function anim(el, frames, opts) {
+		const a = el.animate(frames, Object.assign({ fill: 'both', easing: 'ease-in-out' }, opts));
+		anims.push(a);
+		return a;
+	}
+	const show = (el, delay, duration = 400, to = 1) => anim(el, [{ opacity: 0 }, { opacity: to }], { delay, duration });
+
+	// Distance along a wire to the point closest to (x, y).
+	function along(id, x, y) {
+		const w = wires[id];
+		let best = 0, bestD = Infinity;
+		for (let s = 0; s <= w.len; s += 2) {
+			const p = w.base.getPointAtLength(s);
+			const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+			if (d < bestD) { bestD = d; best = s; }
+		}
+		return best;
+	}
+
+	const start = {};
+	const SPEED = 560; // px/s
+	function energize(id, delay) {
+		const w = wires[id];
+		start[id] = delay;
+		for (const el of [w.live, w.halo]) {
+			el.style.strokeDasharray = `${w.len} ${w.len}`;
+			anim(el, [{ strokeDashoffset: w.len }, { strokeDashoffset: 0 }], { delay, duration: w.len / SPEED * 1000, easing: 'linear' });
+		}
+		if (w.flow) {
+			anim(w.flow, [{ strokeDashoffset: 0 }, { strokeDashoffset: -40 }], { duration: 520, iterations: Infinity, easing: 'linear' });
+			show(w.flow, delay + w.len / SPEED * 1000, 500, .85);
+		}
+		return delay + w.len / SPEED * 1000;
+	}
+	const reach = (id, x, y) => start[id] + along(id, x, y) / SPEED * 1000;
+
+	function stepBar(i, from, to) {
+		anim(steps[i], [{ opacity: .45 }, { opacity: 1 }], { delay: from, duration: 250 });
+		anim(steps[i].querySelector('.bar'), [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { delay: from, duration: Math.max(to - from, 300), easing: 'linear' });
+	}
+
+	function play() {
+		// stars twinkle on their own
+		let seed = 7;
+		const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+		for (const s of $$('.stars-sky circle')) {
+			anim(s, [{ opacity: .3 }, { opacity: 1 }], { duration: 1400 + rnd() * 2600, delay: -rnd() * 4000, iterations: Infinity, direction: 'alternate' });
+		}
+
+		// 1 · vedení VN a trafostanice
+		energize('hv1', 0); energize('hv2', 0); energize('hv3', 0);
+		const tJ = 650;
+		energize('j1', tJ); energize('j2', tJ); energize('j3', tJ);
+		anim($('#tr-hum'), [{ opacity: 0 }, { opacity: 1, offset: .45 }, { opacity: .3 }], { delay: 800, duration: 1600 });
+		const tLv = energize('lv', 1100);
+
+		// 2 · přípojka a elektroměr
+		show($('#meter'), tLv, 300);
+		anim($('#meter-led'), [{ opacity: 0 }, { opacity: 1, offset: .08 }, { opacity: 0, offset: .3 }, { opacity: 0 }], { delay: tLv + 300, duration: 1100, iterations: Infinity });
+		const tFeed = energize('feed', tLv + 250);
+
+		// 3 · rozvaděč
+		anim($('#main-switch'), [{ transform: 'translateY(4px)' }, { transform: 'translateY(0)' }], { delay: tFeed + 150, duration: 220 });
+		show($('#sb-led'), tFeed + 400, 250);
+		const tBrk = tFeed + 550;
+		$$('.brk').forEach((b, i) => anim(b, [{ transform: 'translateY(8px)' }, { transform: 'translateY(0)' }], { delay: tBrk + i * 150, duration: 140 }));
+		energize('l1', tBrk + 80);
+		energize('l2', tBrk + 230);
+		energize('s1', tBrk + 380);
+		const tO1 = energize('o1', tBrk + 530);
+		energize('l1s', reach('l1', 916, 358));
+		energize('o1a', reach('o1', 1110, 600));
+		energize('o1b', reach('o1', 1175, 600));
+		show($('#hub-led'), reach('s1', 830, 490), 300, .5);
+
+		// 4 · osvětlení: each lamp lights up when the current reaches it
+		let first = Infinity, last = 0;
+		for (const el of $$('.lamp')) {
+			const [x, y] = el.dataset.at.split(' ').map(Number);
+			const t = reach(el.dataset.wire, x, y);
+			first = Math.min(first, t); last = Math.max(last, t);
+			show(el, t, 450);
+		}
+
+		// 5 · chytrá domácnost
+		const tSmart = last + 600;
+		anim($('#hub-led'), [{ opacity: .5 }, { opacity: 1 }], { delay: tSmart, duration: 300, fill: 'forwards' });
+		$$('.arc').forEach((a, i) => anim(a, [{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, offset: .2 }, { opacity: 0, transform: 'scale(1.15)' }], { delay: tSmart + i * 260, duration: 2200, iterations: Infinity, easing: 'ease-out' }));
+		anim($('#blind-e'), [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { delay: tSmart + 300, duration: 1500 });
+		anim($('#blind-f'), [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { delay: tSmart + 500, duration: 1500 });
+		anim($('.t-old'), [{ opacity: 1 }, { opacity: 0 }], { delay: tSmart + 900, duration: 350 });
+		show($('.t-new'), tSmart + 1100, 350);
+		anim($('#thermo'), [{ stroke: '#cfd8e8' }, { stroke: '#ffb86b' }], { delay: tSmart + 1100, duration: 350 });
+		for (const el of [$('#lamp-f'), $('#pool-f')]) anim(el, [{ opacity: 1 }, { opacity: .18 }], { delay: tSmart + 1500, duration: 1200, fill: 'forwards' });
+		show($('#night-stars'), tSmart + 1900, 1000, .9);
+		show($('#night-dome'), tSmart + 1700, 400);
+
+		// 6 · zabezpečení
+		const tSec = tSmart + 3000;
+		show($('#kp-lock'), tSec, 300);
+		show($('#kp-led'), tSec, 300);
+		$$('.pir-led').forEach((el, i) => show(el, tSec + 300 + i * 200, 200));
+		$$('.fan').forEach((el, i) => anim(el, [{ opacity: 0 }, { opacity: .9, offset: .3 }, { opacity: 0 }], { delay: tSec + 300 + i * 200, duration: 1400 }));
+		show($('#cam-cone'), tSec + 500, 600);
+		anim($('#cam'), [{ transform: 'rotate(-7deg)' }, { transform: 'rotate(7deg)' }], { delay: tSec + 500, duration: 4200, iterations: Infinity, direction: 'alternate' });
+		anim($('#siren-led'), [{ opacity: .15 }, { opacity: 1 }], { delay: tSec + 300, duration: 900, iterations: Infinity, direction: 'alternate' });
+		const tEnd = tSec + 1600;
+
+		if (narrow.matches) {
+			pan = anim(svg, [{ transform: 'translateX(0)' }, { transform: 'translateX(-34.4%)' }], { delay: tLv - 200, duration: tFeed - tLv + 900 });
+		}
+
+		stepBar(0, 0, tLv);
+		stepBar(1, tLv, tFeed);
+		stepBar(2, tFeed, tBrk + 8 * 150);
+		stepBar(3, first, last);
+		stepBar(4, tSmart, tSmart + 2900);
+		stepBar(5, tSec, tEnd);
+		return tEnd;
+	}
+
+	let duration = play();
+	let paused = [];
+	replay.addEventListener('click', () => {
+		anims.forEach(a => a.cancel());
+		anims = [];
+		paused = [];
+		duration = play();
+	});
+	// The pan only makes sense on a narrow screen; after a rotation the CSS position applies.
+	narrow.addEventListener('change', () => pan && pan.cancel());
+
+	// Seek for screenshots: ?t=<ms> freezes the scene at that time.
+	const t = new URLSearchParams(location.search).get('t');
+	window.sceneSeek = ms => anims.forEach(a => { a.pause(); a.currentTime = ms; });
+	window.sceneDuration = () => duration;
+	if (t !== null) { window.sceneSeek(Number(t)); return; }
+
+	// Save the visitor's CPU while the scene is off screen.
+	// The intro waits until the scene is in view, and stops while it is off screen.
+	// play() would rewind finished animations, so resume only the ones paused here.
+	paused = anims.slice();
+	paused.forEach(a => a.pause());
+	new IntersectionObserver(([e]) => {
+		if (e.intersectionRatio >= .35) {
+			paused.forEach(a => a.play());
+			paused = [];
+		} else if (!paused.length) {
+			paused = anims.filter(a => a.playState === 'running');
+			paused.forEach(a => a.pause());
+		}
+	}, { threshold: [0, .35] }).observe(fig);
+})();
+</script>
+</body>
+</html>
