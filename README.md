@@ -8,12 +8,13 @@ Jednostránkový web pro elektrikáře nebo malou elektro firmu. Na úvodní str
 
 **Šablona je úplně volná.** Použijte ji k čemukoli, i komerčně, upravte si ji podle sebe a autora uvádět nemusíte. Je uvolněná jako volné dílo podle [CC0 1.0](LICENSE).
 
-Vznikla pro web [smartte.eu](https://smartte.eu). Logo a údaje té firmy v šabloně nejsou.
+Vznikla pro web [smartte.eu](https://smartte.eu). Údaje té firmy v ní nejsou, její logo je ve složce `logo/`.
 
 ## Co v ní je
 
 - `index.html`: celý web v jednom souboru, tedy HTML, CSS, scéna v SVG a JavaScript. Nepotřebuje žádné knihovny ani soubory odjinud a nepoužívá cookies. Má 39 kB, gzipem 11 kB.
 - `favicon.svg`: zástupná ikona, blesk v kruhu.
+- `logo/`: logo z webu smartte.eu, monogram STE v kruhu, jako SVG a PNG 1000 × 1000 s průhledným pozadím. I logo je volné dílo podle CC0, stejně jako zbytek šablony.
 
 ## Jak ji použít
 
